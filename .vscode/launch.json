@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "request": "launch",
+            "name": "(Windows) Launch",
+            "type": "cppvsdbg",
+            // "program": "${workspaceRoot}/../build.d/win-x64_vs2022-crtdynamic-debug/output/debug/gtest_scraper_component.exe",
+            "program": "${workspaceRoot}/build/debug/d3d.exe",
+            // "args": ["--gtest_filter=DuplicatorTest.forceRecoverFailure*"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "integratedTerminal",
+        }
+    ]
+}

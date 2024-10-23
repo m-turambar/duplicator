@@ -1,13 +1,27 @@
 #include "capturer.h"
 
-DXGI_SWAP_CHAIN_DESC createSwapChainDesc(HWND hwnd)
+std::pair<UINT, UINT> getMainDisplayDimensions()
+{
+    ComPtr<IDXGIFactory1> dxgiFactory;
+    ComPtr<IDXGIAdapter1> adapter;
+    CreateDXGIFactory1(__uuidof(IDXGIFactory1), &dxgiFactory);
+    dxgiFactory->EnumAdapters1(0, &adapter);
+    ComPtr<IDXGIOutput> dxgiOutput;
+    adapter->EnumOutputs(0, &dxgiOutput);
+    DXGI_OUTPUT_DESC outputDesc;
+    dxgiOutput->GetDesc(&outputDesc);
+    return {outputDesc.DesktopCoordinates.right,
+        outputDesc.DesktopCoordinates.bottom};
+}
+
+DXGI_SWAP_CHAIN_DESC createSwapChainDesc(HWND hwnd, size_t captureWidth, size_t captureHeight)
 {
     DXGI_SWAP_CHAIN_DESC sd;
     ZeroMemory( &sd, sizeof( sd ) );
     sd.BufferCount = 1;
-    sd.BufferDesc.Width = 1920;
-    sd.BufferDesc.Height = 1080;
-    // sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sd.BufferDesc.Width = captureWidth;
+    sd.BufferDesc.Height = captureHeight;
+    // sd.BufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
     sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     sd.BufferDesc.RefreshRate.Numerator = 60;
     sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -38,7 +52,7 @@ ComPtr<ID3D11Device> createDevice()
     return device;
 }
 
-std::tuple<ComPtr<ID3D11DeviceContext>, ComPtr<ID3D11Device>, ComPtr<IDXGISwapChain>> createDeviceAndSwapChain(HWND hwnd)
+std::tuple<ComPtr<ID3D11DeviceContext>, ComPtr<ID3D11Device>, ComPtr<IDXGISwapChain>> createDeviceAndSwapChain(HWND hwnd, size_t captureWidth, size_t captureHeight)
 {
     const std::vector<D3D_FEATURE_LEVEL> featureLevels = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
         D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
@@ -50,7 +64,7 @@ std::tuple<ComPtr<ID3D11DeviceContext>, ComPtr<ID3D11Device>, ComPtr<IDXGISwapCh
     ComPtr<ID3D11DeviceContext> context;
     
     ComPtr<IDXGISwapChain> swapChain;
-    auto swapChainDesc = createSwapChainDesc(hwnd);
+    auto swapChainDesc = createSwapChainDesc(hwnd, captureWidth, captureHeight);
 
     auto hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0,
         featureLevels.data(), featureLevels.size(), D3D11_SDK_VERSION,
@@ -63,8 +77,8 @@ std::tuple<ComPtr<ID3D11DeviceContext>, ComPtr<ID3D11Device>, ComPtr<IDXGISwapCh
 void defineTheViewPort(ComPtr<ID3D11DeviceContext> context, int width, int height)
 {
     D3D11_VIEWPORT viewport;
-    viewport.Width = static_cast<float>(1920);  // width of the render target
-    viewport.Height = static_cast<float>(1080);  // height of the render target
+    viewport.Width = static_cast<float>(width);  // width of the render target
+    viewport.Height = static_cast<float>(height);  // height of the render target
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
     viewport.TopLeftX = 0;

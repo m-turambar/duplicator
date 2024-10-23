@@ -6,10 +6,9 @@
 
 int main()
 {
-    std::cout << "hola\n";
-
+    auto [captureWidth, captureHeight] = getMainDisplayDimensions();
     auto hwnd = createWindow();
-    auto [d3dContext, d3dDevice, swapChain] = createDeviceAndSwapChain(hwnd);
+    auto [d3dContext, d3dDevice, swapChain] = createDeviceAndSwapChain(hwnd, captureWidth, captureHeight);
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
     HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
@@ -24,14 +23,15 @@ int main()
     }
 
     d3dContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
-    defineTheViewPort(d3dContext, 0, 0);
+    
+    defineTheViewPort(d3dContext, captureWidth, captureHeight);
 
     auto duplicator = GetDuplicatorFromDevice(d3dDevice);
 
     auto setBackground = [&] () {
         static float r = 0.0f;
         static float g = 0.2f;
-        static float b = 0.1f;
+        static float b = 0.4f;
         const float clearColor[4] = {r, g, b, 1.0f};
         d3dContext->ClearRenderTargetView(renderTargetView.Get(), clearColor);
         swapChain->Present(1, 0);
@@ -75,8 +75,9 @@ int main()
             TranslateMessage(&msg);
             DispatchMessage(&msg);
 
-            if (msg.message == WM_QUIT) {
+            if (msg.message == WM_QUIT || msg.message == WM_CLOSE) {
                 running = false;
+                break;
             }
         }
 

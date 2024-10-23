@@ -1,0 +1,4 @@
+# No quiero tener que agregar build cada vez que clono.
+# Recuerda, cd build && cmake .. && msbuild d3d
+*
+!.gitignore

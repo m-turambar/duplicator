@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "Compilar proyecto",
+			"command": "msbuild.exe",
+			"args": [
+				"${workspaceFolder}/build/d3d.sln",
+				"-nologo",
+				"-V:q"
+			]
+		}
+	]
+}
