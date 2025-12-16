@@ -18,14 +18,14 @@ HWND createWindow()
     wc.hInstance = GetModuleHandleA(nullptr);
     wc.lpszClassName = "MyTestWindowClass";
 
-    RegisterClass(&wc);
+    RegisterClassA(&wc);
 
     HWND hwnd = CreateWindowExA(
         0,
         "MyTestWindowClass",
         "My Test Window",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+        CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720,
         NULL,
         NULL,
         GetModuleHandle(nullptr),
